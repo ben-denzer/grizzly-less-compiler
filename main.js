@@ -49,19 +49,34 @@ app.on('activate', function () {
     }
 });
 
-const compileLess = (file) => {
-    console.log('in compileLess');
+const compileLess = (file, cb) => {
     const fullPath = file.slice(0, file.lastIndexOf('/') + 1);
+    const displayName = file.split('/').slice(-2).join('/');
     const fileName = file.slice(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
 
-    exec(`lessc ${file} --autoprefix="last 4 versions" ${fullPath}/${fileName}.css`, (error, stdout, stderr) => {
-        if (error) return console.log('error', error);
-        if (stdout) return console.log('stdout', stdout);
-        if (stderr) return console.log('stderr', stderr);
-    });
-}
+    watch(file, () => compileLess(file, cb));
 
+    exec(`lessc ${file} --autoprefix="last 4 versions" ${fullPath}/${fileName}.css`, (error, stdout, stderr) => {
+        if (error) {
+            mainWindow.focus();
+            cb({output: error.toString(), displayName});
+        }
+        else if (stdout) {
+            mainWindow.focus();
+            cb({output: stdout.toString(), displayName});
+        }
+        else if (stderr) {
+            mainWindow.focus();
+            cb({output: stderr.toString(), displayName});
+        }
+        else {
+            cb({output: "success", displayName});
+        }
+    });
+};
 
 ipcMain.on('file added', (cb, file) => {
-    compileLess(file);
+    compileLess(file, (res) => {
+        cb.sender.send('watching', res);
+    });
 });
