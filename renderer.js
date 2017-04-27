@@ -1,2 +1,7 @@
+const {ipcRenderer} = require('electron');
+
 const myFile = document.getElementById('myFile')
-myFile.addEventListener('change', (e) => console.log(myFile.files[0]));
+myFile.addEventListener('change', () => {
+    console.log(myFile.files[0]);
+    ipcRenderer.send('file added', myFile.files[0].path);
+});

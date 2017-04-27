@@ -18,5 +18,10 @@
   "license": "CC0-1.0",
   "devDependencies": {
     "electron": "~1.6.2"
+  },
+  "dependencies": {
+    "less": "^2.7.2",
+    "less-plugin-autoprefix": "^1.5.1",
+    "node-watch": "^0.5.2"
   }
 }
