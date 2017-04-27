@@ -1,3 +1,2 @@
-// This file is required by the index.html file and will
-// be executed in the renderer process for that window.
-// All of the Node.js APIs are available in this process.
+const myFile = document.getElementById('myFile')
+myFile.addEventListener('change', (e) => console.log(myFile.files[0]));
