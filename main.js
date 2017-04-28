@@ -22,7 +22,7 @@ function createWindow() {
     }));
 
     // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
+    mainWindow.webContents.openDevTools();
 
     // Emitted when the window is closed.
     mainWindow.on('closed', function () {
@@ -49,16 +49,38 @@ app.on('activate', function () {
     }
 });
 
+let watcher = watch([], () => {});
+
+const watchFiles = {
+    add: function(file) {
+        watcher.close();
+        watchFiles.files = [...watchFiles.files, file];
+    }.bind(this),
+    remove: function(file) {
+        watcher.close();
+        const index = watchFiles.files.indexOf(file);
+        if (index >= 0) {
+            this.watchedFiles = [
+                ...this.watchedFiles.slice(0, index),
+                ...this.watchedFiles.slice(index + 1),
+            ];
+        }
+    }.bind(this),
+    files: [],
+}
+
 const compileLess = (file, cb) => {
+    console.log('watcher.watchedFiles');
     const fullPath = file.slice(0, file.lastIndexOf('/') + 1);
     const displayName = file.split('/').slice(-2).join('/');
     const fileName = file.slice(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
     const splitPath = file.split(/\\\//).slice(0, -2);
     const outputPath = path.join(path.normalize(`${fullPath}`), `${fileName}.css`);
+    watcher = watch(watchFiles.files, () => {
+        compileLess(file, cb);
+    });
 
-    watch(file, () => compileLess(file, cb));
-
-    exec(`lessc ${file} --autoprefix="last 4 versions" ${outputPath}`, (error, stdout, stderr) => {
+    exec(`lessc "${file}" --autoprefix="last 4 versions" ${outputPath}`, (error, stdout, stderr) => {
         if (error) {
             mainWindow.focus();
             cb({output: error.toString(), displayName});
@@ -78,6 +100,7 @@ const compileLess = (file, cb) => {
 };
 
 ipcMain.on('file added', (cb, file) => {
+    watchFiles.add(file);
     compileLess(file, (res) => {
         cb.sender.send('watching', res);
     });

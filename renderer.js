@@ -14,10 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     ipcRenderer.on('watching', (event, res) => {
-        myFile.style.display = 'none';
         statusContainer.style.display = 'block';
         outputContainer.style.display = 'block';
         outputContainer.innerHTML = res.output;
+        myFile.files[0] = null;
 
         if (!/success/.test(res.output)) {
             outputContainer.style.color = 'red';
