@@ -11,10 +11,10 @@
             border: 2px solid #666;
             padding: 20px;
         }
-        #statusBox {
+        .statusBox {
             font-size: 18px;
         }
-        #watching {
+        .watching {
             color: green;
             font-weight: bold;
         }
@@ -23,10 +23,10 @@
 
 <body>
     <h1>Grizzly</h1>
-    <h2>Please Don't Trust This Too Much Yet - I Literally Made It In One Night And Only Have Tested It On One Site So Far</h2>
-    <input id="myFile" type="file">
+    <div id="inputContainer">
+        <input id="myFile" type="file">
+    </div>
     <div id="statusContainer">
-        <span id="statusBox"></span> - <span id="watching">Watching</span>
     </div>
     <div id="outputContainer"></div>
 </body>

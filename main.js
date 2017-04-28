@@ -55,46 +55,45 @@ const watchFiles = {
     add: function(file) {
         watcher.close();
         watchFiles.files = [...watchFiles.files, file];
-    }.bind(this),
+    },
     remove: function(file) {
         watcher.close();
         const index = watchFiles.files.indexOf(file);
         if (index >= 0) {
-            this.watchedFiles = [
-                ...this.watchedFiles.slice(0, index),
-                ...this.watchedFiles.slice(index + 1),
+            watchFiles.files = [
+                ...watchFiles.files.slice(0, index),
+                ...watchFiles.files.slice(index + 1),
             ];
         }
-    }.bind(this),
+    },
     files: [],
 }
 
 const compileLess = (file, cb) => {
-    console.log('watcher.watchedFiles');
     const fullPath = file.slice(0, file.lastIndexOf('/') + 1);
-    const displayName = file.split('/').slice(-2).join('/');
     const fileName = file.slice(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
-    const splitPath = file.split(/\\\//).slice(0, -2);
     const outputPath = path.join(path.normalize(`${fullPath}`), `${fileName}.css`);
-    watcher = watch(watchFiles.files, () => {
-        compileLess(file, cb);
+    watcher = watch(watchFiles.files, (e, filename) => {
+        if (e === 'update') {
+            compileLess(filename, cb);
+        }
     });
 
     exec(`lessc "${file}" --autoprefix="last 4 versions" ${outputPath}`, (error, stdout, stderr) => {
         if (error) {
             mainWindow.focus();
-            cb({output: error.toString(), displayName});
+            cb({ output: error.toString(), file });
         }
         else if (stdout) {
             mainWindow.focus();
-            cb({output: stdout.toString(), displayName});
+            cb({ output: stdout.toString(), file });
         }
         else if (stderr) {
             mainWindow.focus();
-            cb({output: stderr.toString(), displayName});
+            cb({ output: stderr.toString(), file });
         }
         else {
-            cb({output: "success", displayName});
+            cb({ output: "success", file });
         }
     });
 };
@@ -104,4 +103,15 @@ ipcMain.on('file added', (cb, file) => {
     compileLess(file, (res) => {
         cb.sender.send('watching', res);
     });
+});
+
+ipcMain.on('file removed', (cb, file) => {
+    watchFiles.remove(file);
+    watcher.close();
+    cb.sender.send('removed');
+    if (watchFiles.files.length > 0) {
+        compileLess(watchFiles.files[0], (res) => {
+            cb.sender.send('watching', res);
+        });
+    }
 });
