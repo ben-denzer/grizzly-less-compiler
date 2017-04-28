@@ -9,7 +9,8 @@ document.addEventListener('DOMContentLoaded', () => {
     outputContainer.style.display = 'none';
 
     myFile.addEventListener('change', () => {
-        ipcRenderer.send('file added', myFile.files[0].path);
+        const myPath = myFile.files[0].path.toString();
+        ipcRenderer.send('file added', myPath);
     });
 
     ipcRenderer.on('watching', (event, res) => {
@@ -24,8 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
             outputContainer.style.color = 'green';
         }
 
-        statusBox.innerText = res.displayName;
+        statusBox.innerText = res.displayName.split(/[\\\/]/).slice(-2).join('/');
     });
-
-    ipcRenderer.on('less error', () => console.log('less error'));
 });

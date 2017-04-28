@@ -53,10 +53,12 @@ const compileLess = (file, cb) => {
     const fullPath = file.slice(0, file.lastIndexOf('/') + 1);
     const displayName = file.split('/').slice(-2).join('/');
     const fileName = file.slice(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
+    const splitPath = file.split(/\\\//).slice(0, -2);
+    const outputPath = path.join(path.normalize(`${fullPath}`), `${fileName}.css`);
 
     watch(file, () => compileLess(file, cb));
 
-    exec(`lessc ${file} --autoprefix="last 4 versions" ${fullPath}/${fileName}.css`, (error, stdout, stderr) => {
+    exec(`lessc ${file} --autoprefix="last 4 versions" ${outputPath}`, (error, stdout, stderr) => {
         if (error) {
             mainWindow.focus();
             cb({output: error.toString(), displayName});
