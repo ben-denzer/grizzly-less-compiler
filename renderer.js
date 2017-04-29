@@ -103,6 +103,7 @@ function toggleListenersOnButtons(add) {
 
 document.addEventListener('DOMContentLoaded', () => {
     replaceFileInput();
+    ipcRenderer.send('check initial settings');
     getId('outputFile').addEventListener('change', () => {
         const outputPath = getId('outputFile').files[0].path;
         ipcRenderer.send('change output path', outputPath);
@@ -128,5 +129,15 @@ ipcRenderer.on('removed', () => {
 });
 
 ipcRenderer.on('output path changed', (event, res) => {
-    getId('displayOutputPath').innerText = res.toString();
+    getId('displayOutputPath').innerText = res || "Output path set to current folder";
+
+    const resetPath = () => { ipcRenderer.send('change output path', null) };
+
+    if (res) {
+        getId('resetOutputPathButton').style.display = 'block';
+        getId('resetOutputPathButton').addEventListener('click', resetPath);
+    } else {
+        getId('resetOutputPathButton').style.display = 'none';
+        getId('resetOutputPathButton').removeEventListener('click', resetPath);
+    }
 });

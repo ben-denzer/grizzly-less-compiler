@@ -102,6 +102,16 @@ body {
             #displayOutputPath {
                 font-size: 12px;
             }
+
+            #resetOutputPathButton {
+                font-size: 14px;
+                color: blue;
+                display: none;
+
+                &:hover {
+                    text-decoration: underline;
+                }
+            }
         }
     }
 }

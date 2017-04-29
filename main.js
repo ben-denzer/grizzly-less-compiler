@@ -7,6 +7,7 @@ const app = electron.app;
 const BrowserWindow = electron.BrowserWindow
 const path = require('path');
 const url = require('url');
+const fs = require('fs');
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -30,7 +31,10 @@ function createWindow() {
     });
 }
 
-app.on('ready', createWindow);
+app.on('ready', () => {
+    createWindow();
+    getInitialSettings();
+});
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
@@ -48,6 +52,13 @@ app.on('activate', function () {
         createWindow();
     }
 });
+
+const getInitialSettings = () => {
+    fs.readFile(path.join(__dirname, 'settings', 'outputPath.txt'), 'utf8', (err, data) => {
+        if (err || /^null/.test(data)) return;
+        watchFiles.outputPath = data;
+    });
+};
 
 let watcher = watch([], () => {});
 
@@ -121,5 +132,12 @@ ipcMain.on('refresh', (cb, file) => {
 
 ipcMain.on('change output path', (event, file) => {
     watchFiles = Object.assign({}, watchFiles, { outputPath: file });
+    fs.writeFile(path.join(__dirname, 'settings', 'outputPath.txt'), file, (err, data) => { err && console.log(err)});
     event.sender.send('output path changed', file);
 });
+
+ipcMain.on('check initial settings', (e, file) => {
+    if (watchFiles.outputPath && watchFiles.outputPath !== 'null') {
+        e.sender.send('output path changed', watchFiles.outputPath);
+    }
+})
