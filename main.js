@@ -53,35 +53,30 @@ let watcher = watch([], () => {});
 
 let watchFiles = {
     add: function(file) {
-        watcher.close();
-        watchFiles.files = [...watchFiles.files, file];
+        watchFiles.files.add(file);
+    },
+    get: function() {
+        return [...watchFiles.files];
     },
     remove: function(file) {
-        watcher.close();
-        const index = watchFiles.files.indexOf(file);
-        if (index >= 0) {
-            watchFiles.files = [
-                ...watchFiles.files.slice(0, index),
-                ...watchFiles.files.slice(index + 1),
-            ];
-        }
+        watchFiles.files.delete(file);
     },
-    files: [],
+    files: new Set(),
     outputPath: null,
 }
 
-const compileLess = (file, cb) => {
+const compileLess = (file = watchFiles.get()[0], cb) => {
+    if (!file) return;
     const fullPath = file.slice(0, file.lastIndexOf('/') + 1).replace(' ', '\\ ');
     const fileName = file.slice(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
     const outputPath = watchFiles.outputPath || path.join(path.normalize(`${fullPath}`), `${fileName}.css`);
-
-    watcher = watch(watchFiles.files, (e, filename) => {
+    watcher.close();
+    watcher = watch(watchFiles.get(), (e, filename) => {
         if (e === 'update') {
             cb({ loading: true });
             compileLess(filename, cb);
         }
     });
-
     exec(`lessc "${file}" --autoprefix="last 4 versions" ${outputPath}`, (error, stdout, stderr) => {
         if (error) {
             mainWindow.focus();
@@ -112,11 +107,9 @@ ipcMain.on('file removed', (cb, file) => {
     watchFiles.remove(file);
     watcher.close();
     cb.sender.send('removed');
-    if (watchFiles.files.length > 0) {
-        compileLess(watchFiles.files[0], (res) => {
-            cb.sender.send('watching', res);
-        });
-    }
+    compileLess(undefined, (res) => {
+        cb.sender.send('watching', res);
+    });
 });
 
 ipcMain.on('change output path', (event, file) => {
