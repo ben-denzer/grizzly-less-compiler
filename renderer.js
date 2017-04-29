@@ -28,7 +28,7 @@ function makeStatusBox(fileName) {
                  </span>
             </div>
             <div class="statusRowRight">
-                <img class="refreshButton" src="./img/refresh.ico" alt="compile">
+                <img class="refreshButton" data-filename="${fileName}" src="./img/refresh.ico" alt="compile">
             </div>
         </div>`
     );
@@ -36,9 +36,9 @@ function makeStatusBox(fileName) {
 
 function populateStatusContainer() {
     statusHtml = [...activeFiles].map(makeStatusBox).join(' ');
-    toggleListenersOnCloseButtons();  // removes listeners
+    toggleListenersOnButtons(); // removes listeners
     getId('statusContainer').innerHTML = statusHtml;
-    toggleListenersOnCloseButtons('add');
+    toggleListenersOnButtons('add');
 }
 
 function replaceFileInput() {
@@ -59,26 +59,44 @@ function replaceFileInput() {
     getId('inputContainer').appendChild(newInput);
 }
 
-function toggleListenersOnCloseButtons(add) {
-    const buttons = document.getElementsByClassName('removeButton');
-    const buttonListener = (e) => {
+function showLoading() {
+    return `<img id="loading" src="./img/loading.gif" alt="loading">`;
+}
+
+function toggleListenersOnButtons(add) {
+    const closeButtons = document.getElementsByClassName('removeButton');
+    const closeButtonListener = (e) => {
         activeFiles.delete(e.target.dataset.filename);
         ipcRenderer.send('file removed', e.target.dataset.filename);
     };
 
-    for (let i in buttons) {
-        if (buttons.hasOwnProperty(i)) {
+    for (let i in closeButtons) {
+        if (closeButtons.hasOwnProperty(i)) {
             if (add) {
-                buttons[i].addEventListener('click', buttonListener);
+                closeButtons[i].addEventListener('click', closeButtonListener);
             } else {
-                buttons[i].removeEventListener('click', buttonListener);
+                closeButtons[i].removeEventListener('click', closeButtonListener);
+            }
+        }
+    }
+
+    const refreshButtons = document.getElementsByClassName('refreshButton');
+    const refreshButtonListener = (e) => {
+        ipcRenderer.send('refresh', e.target.dataset.filename);
+    }
+
+    for (let i in refreshButtons) {
+        if (refreshButtons.hasOwnProperty(i)) {
+            if (add) {
+                refreshButtons[i].addEventListener('click', refreshButtonListener);
+            } else {
+                refreshButtons[i].removeEventListener('click', refreshButtonListener);
             }
         }
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    getId('loading').style.display = 'none';
     replaceFileInput();
     getId('outputFile').addEventListener('change', () => {
         const outputPath = getId('outputFile').files[0].path;
@@ -87,8 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 ipcRenderer.on('watching', (event, res) => {
-    getId('loading').style.display = res.loading ? 'block' : 'none';
-    outputContainer.innerText = res.loading ? '' : filterOutput(res.output);
+    outputContainer.innerHTML = res.loading ? showLoading() : filterOutput(res.output);
     activeFiles.add(res.file);
     replaceFileInput();
     populateStatusContainer();

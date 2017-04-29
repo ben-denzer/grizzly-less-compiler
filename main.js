@@ -67,6 +67,7 @@ let watchFiles = {
 
 const compileLess = (file = watchFiles.get()[0], cb) => {
     if (!file) return;
+    cb({ loading: true });
     const fullPath = file.slice(0, file.lastIndexOf('/') + 1).replace(' ', '\\ ');
     const fileName = file.slice(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
     const outputPath = watchFiles.outputPath || path.join(path.normalize(`${fullPath}`), `${fileName}.css`);
@@ -108,6 +109,12 @@ ipcMain.on('file removed', (cb, file) => {
     watcher.close();
     cb.sender.send('removed');
     compileLess(undefined, (res) => {
+        cb.sender.send('watching', res);
+    });
+});
+
+ipcMain.on('refresh', (cb, file) => {
+    compileLess(file, (res) => {
         cb.sender.send('watching', res);
     });
 });
