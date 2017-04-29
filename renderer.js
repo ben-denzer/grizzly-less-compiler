@@ -54,6 +54,11 @@ function replaceFileInput() {
     newInput.id = 'myFile';
     newInput.addEventListener('change', () => {
         const myPath = newInput.files[0].path.toString();
+        if (!/.less/i.test(myPath.slice(-5))) {
+            getId('outputContainer').innerText = "Thats Not A .less File";
+            replaceFileInput();
+            return;
+        }
         ipcRenderer.send('file added', myPath);
     });
     getId('inputContainer').appendChild(newInput);
