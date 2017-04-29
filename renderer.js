@@ -4,6 +4,9 @@ const getId = (ID) => document.getElementById(ID);
 let activeFiles = new Set();
 
 function filterOutput(str) {
+    if (/^success/.test(str)) {
+        return str;
+    }
     var temp = str.slice(str.search(/\d\dm/) + 3);
     temp = temp.split('').map(a => {
         return a.charCodeAt(0) > 126 || a.charCodeAt(0) < 32 ? ' ' : a
@@ -12,16 +15,19 @@ function filterOutput(str) {
 }
 
 function makeStatusBox(fileName) {
-    const displayName = fileName.split('/').slice(-2).join('/');
+    const displayName = fileName ? fileName.split('/').slice(-2).join('/') : '';
 
     return (
-        `<div>
-            <div class="removeButton" data-filename="${fileName}">X</div>
-            <span class="statusBox">
-                ${displayName}
-            </span> - <span class="watching">
-                Watching
-            </span>
+        `<div class="statusRow">
+            <div class="statusRowLeft">
+                <div class="removeButton" data-filename="${fileName}">X</div>
+                <span class="statusBox">
+                    ${displayName}
+                 </span>
+            </div>
+            <div class="statusRowRight">
+                <img class="refreshButton" src="./img/refresh.ico" alt="compile">
+            </div>
         </div>`
     );
 }
@@ -70,20 +76,33 @@ function toggleListenersOnCloseButtons(add) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+    getId('loading').style.display = 'none';
     replaceFileInput();
+    getId('outputFile').addEventListener('change', () => {
+        const outputPath = getId('outputFile').files[0].path;
+        ipcRenderer.send('change output path', outputPath);
+    });
 });
 
 ipcRenderer.on('watching', (event, res) => {
-    outputContainer.innerHTML = filterOutput(res.output);
+    getId('loading').style.display = res.loading ? 'block' : 'none';
+    outputContainer.innerText = res.loading ? '' : filterOutput(res.output);
     activeFiles.add(res.file);
     replaceFileInput();
     populateStatusContainer();
 
-    if (!/^success/.test(res.output)) {
+    if (res.output && !/^success/.test(res.output)) {
         outputContainer.style.color = 'red';
     } else {
         outputContainer.style.color = 'green';
     }
 });
 
-ipcRenderer.on('removed', () => populateStatusContainer());
+ipcRenderer.on('removed', () => {
+    populateStatusContainer();
+    if (!activeFiles.length) getId('outputContainer').innerText = '';
+});
+
+ipcRenderer.on('output path changed', (event, res) => {
+    getId('displayOutputPath').innerText = res.toString();
+});

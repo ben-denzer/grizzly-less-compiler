@@ -1,0 +1,104 @@
+$fullHeight: 575px;
+$fullWidth: 750px;
+$borderColor: #666;
+
+body {
+    height: $fullHeight;
+    width: $fullWidth;
+    font-size: 18px;
+
+    div {
+        box-sizing: border-box;
+    }
+
+    #pageContainer {
+        display: flex;
+        justify-content: space-between;
+
+        #loading {
+            position: absolute;
+            width: $fullWidth;
+            text-align: center;
+        }
+
+        #mainWindow {
+            width: 170%;
+
+            h1 {
+                font-size: 32px;
+                text-align: center;
+            }
+
+            label {
+            }
+
+            #inputContainer {
+                margin-bottom: 25px;
+
+                input {
+
+                }
+            }
+
+            #statusContainer {
+                .statusRow {
+                    border: 2px solid $borderColor;
+                    padding: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 15px;
+
+                    .statusRowLeft {
+                        display: flex;
+                        align-items: center;
+
+                        .removeButton {
+                            font-size: 38px;
+                            color: darkred;
+                            margin-right: 20px;
+
+                            &:hover {
+                                cursor: pointer;
+                                color: red;
+                            }
+                        }
+                    }
+                    .statusRowRight {
+                        display: flex;
+                        align-items: center;
+
+                        .refreshButton {
+                            height: 38px;
+                            width: auto;
+                            opacity: .8;
+
+                            &:hover {
+                                opacity: 1;
+                                cursor: pointer;
+                            }
+                        }
+                    }
+                }
+            }
+
+            #outputContainer {
+
+            }
+        }
+
+        #sidebar {
+            label {
+                font-size: 14px;
+            }
+
+            input {
+                margin-bottom: 25px;
+            }
+
+            #displayOutputPath {
+                font-size: 12px;
+            }
+        }
+    }
+}

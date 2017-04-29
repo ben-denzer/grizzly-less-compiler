@@ -51,7 +51,7 @@ app.on('activate', function () {
 
 let watcher = watch([], () => {});
 
-const watchFiles = {
+let watchFiles = {
     add: function(file) {
         watcher.close();
         watchFiles.files = [...watchFiles.files, file];
@@ -67,14 +67,17 @@ const watchFiles = {
         }
     },
     files: [],
+    outputPath: null,
 }
 
 const compileLess = (file, cb) => {
-    const fullPath = file.slice(0, file.lastIndexOf('/') + 1);
+    const fullPath = file.slice(0, file.lastIndexOf('/') + 1).replace(' ', '\\ ');
     const fileName = file.slice(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
-    const outputPath = path.join(path.normalize(`${fullPath}`), `${fileName}.css`);
+    const outputPath = watchFiles.outputPath || path.join(path.normalize(`${fullPath}`), `${fileName}.css`);
+
     watcher = watch(watchFiles.files, (e, filename) => {
         if (e === 'update') {
+            cb({ loading: true });
             compileLess(filename, cb);
         }
     });
@@ -114,4 +117,9 @@ ipcMain.on('file removed', (cb, file) => {
             cb.sender.send('watching', res);
         });
     }
+});
+
+ipcMain.on('change output path', (event, file) => {
+    watchFiles = Object.assign({}, watchFiles, { outputPath: file });
+    event.sender.send('output path changed', file);
 });
