@@ -1,34 +1,17 @@
-const electron = require('electron');
-const ipcMain = require('electron').ipcMain;
-const watch = require('node-watch');
-const exec = require('child_process').exec;
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow
-const path = require('path');
-const url = require('url');
-const fs = require('fs');
+// Electron
+const electron  = require('electron');
+const ipcMain   = require('electron').ipcMain;
+const app       = electron.app;
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
+// Node
+const watch     = require('node-watch');
+const exec      = require('child_process').exec;
+const path      = require('path');
+const fs        = require('fs');
 
-function createWindow() {
-    mainWindow = new BrowserWindow({ width: 800, height: 600 });
-
-    mainWindow.loadURL(url.format({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file:',
-        slashes: true,
-    }));
-
-    // Open the DevTools.
-    // mainWindow.webContents.openDevTools();
-
-    // Emitted when the window is closed.
-    mainWindow.on('closed', function () {
-        mainWindow = null;
-    });
-}
+// Services
+const createWindow  = require('./src/services/main/createWindow');
+const mainWindow    = require('./src/services/main/createWindow').mainWindow;
 
 app.on('ready', () => {
     createWindow();
@@ -37,16 +20,12 @@ app.on('ready', () => {
 
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
-    // On OS X it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
     if (process.platform !== 'darwin') {
         app.quit();
     }
 });
 
 app.on('activate', function () {
-    // On OS X it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (mainWindow === null) {
         createWindow();
     }
@@ -139,4 +118,6 @@ ipcMain.on('check initial settings', (e, file) => {
     if (watchFiles.outputPath && watchFiles.outputPath !== 'null') {
         e.sender.send('output path changed', watchFiles.outputPath);
     }
-})
+});
+
+module.exports.mainWindow = mainWindow;

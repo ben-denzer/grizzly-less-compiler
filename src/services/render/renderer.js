@@ -28,7 +28,7 @@ function makeStatusBox(fileName) {
                  </span>
             </div>
             <div class="statusRowRight">
-                <img class="refreshButton" data-filename="${fileName}" src="./img/refresh.ico" alt="compile">
+                <img class="refreshButton" data-filename="${fileName}" src="./src/img/refresh.ico" alt="compile">
             </div>
         </div>`
     );
@@ -65,7 +65,7 @@ function replaceFileInput() {
 }
 
 function showLoading() {
-    return `<img id="loading" src="./img/loading.gif" alt="loading">`;
+    return `<img id="loading" src="./src/img/loading.gif" alt="loading">`;
 }
 
 function toggleListenersOnButtons(add) {
