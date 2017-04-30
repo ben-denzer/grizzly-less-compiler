@@ -17,7 +17,7 @@ function filterOutput(str) {
 function makeStatusBox(fileName) {
     if (!fileName) return;
 
-    const displayName = fileName.split('/').slice(-2).join('/');
+    const displayName = fileName.split(/[\\\/]/).slice(-2).join('/');
 
     return (
         `<div class="statusRow">
