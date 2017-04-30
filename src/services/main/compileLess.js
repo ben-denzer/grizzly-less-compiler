@@ -1,15 +1,18 @@
 const exec          = require('child_process').exec;
-const path          = require('path');
-
 const mainWindow    = require('./createWindow').mainWindow;
+const path          = require('path');
 const watch         = require('node-watch');
 
 function compileLess(file = model.getFiles()[0], model, watcher, cb) {
     if (!file) return;
     cb({ loading: true });
+
     const fullPath = file.slice(0, file.lastIndexOf('/') + 1).replace(' ', '\\ ');
     const fileName = file.slice(file.lastIndexOf('/') + 1, file.lastIndexOf('.'));
-    const outputPath = model.getOutputPath() || path.join(path.normalize(`${fullPath}`), `${fileName}.css`);
+    const outputPath =
+        model.getSettings().outputPath ||
+        path.join(path.normalize(`${fullPath}`), `${fileName}.css`);
+
     watcher.close();
     watcher = watch(model.getFiles(), (e, filename) => {
         if (e === 'update') {

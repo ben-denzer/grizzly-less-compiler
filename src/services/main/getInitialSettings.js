@@ -3,9 +3,19 @@ const path  = require('path');
 
 const getInitialSettings = () => {
     return new Promise((resolve, reject) => {
-        fs.readFile(path.join(__dirname, '../../settings', 'outputPath.txt'), 'utf8', (err, data) => {
+        fs.readFile(path.join(__dirname, '../../settings.txt'), 'utf8', (err, data) => {
             if (err) reject(new Error('error getting settings'));
-            resolve(JSON.parse(data));
+            console.log('in init', data);
+            if (data) {
+                const settings = Object.assign(
+                    {},
+                    JSON.parse(data),
+                    { files: new Set(data.files) }
+                );
+                resolve(settings);
+            } else {
+                resolve('');
+            }
         });
     });
 };

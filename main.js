@@ -22,7 +22,12 @@ const model = new MainModel();
 // App Setup
 app.on('ready', () => {
     createWindow();
-    // getInitialSettings();
+    getInitialSettings()
+        .then(data => {
+            if (data) {
+                model.setInitialSettings(data)
+            }
+        }).catch(err => console.log(err));
 });
 
 app.on('window-all-closed', function () {
@@ -67,11 +72,14 @@ ipcMain.on('change output path', (event, file) => {
 });
 
 ipcMain.on('check initial settings', (e, file) => {
-    return;
-    // const outputPath = model.getOutputPath();
-    // if (outputPath && outputPath !== 'null') {
-    //     e.sender.send('output path changed', outputPath);
-    // }
+    const outputPath = model.getSettings().outputPath;
+    const files = model.getFiles();
+    if (files.length) {
+        [...files].forEach(a => compileLess(a, model, watcher, e));
+    }
+    if (outputPath && outputPath !== 'null') {
+        e.sender.send('output path changed', outputPath);
+    }
 });
 
 // Exports

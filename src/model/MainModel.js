@@ -1,31 +1,47 @@
+const saveState = require('../services/main/saveState');
+
 class model {
     constructor() {
         this.state = {
             files: new Set(),
-            outputPath: '',
+            settings: {
+                outputPath: '',
+            },
         };
-        this.addFile        = this.addFile.bind(this);
-        this.getFiles       = this.getFiles.bind(this);
-        this.getOutputPath  = this.getOutputPath.bind(this);
-        this.setOutputPath  = this.setOutputPath.bind(this);
-        this.removeFile     = this.removeFile.bind(this);
+
+        const methods = [
+            'addFile',
+            'getFiles',
+            'getSettings',
+            'setInitialSettings',
+            'setOutputPath',
+            'removeFile',
+        ];
+        methods.forEach(a => this[a] = this[a].bind(this));
     }
     addFile(file) {
-        this.state = Object.assign({}, this.state, { files: this.state.files.add(file) });
+        this.state.files.add(file);
+        saveState(this.state);
     }
     getFiles() {
         return [...this.state.files];
     }
-    getOutputPath() {
-        return this.state.outputPath;
+    getSettings() {
+        return this.state.settings;
+    }
+    setInitialSettings(settings) {
+        if (settings) {
+            this.state = Object.assign({}, settings);
+        }
     }
     setOutputPath(path) {
-        this.state = Object.assign({}, this.state, { outputPath: path });
-        //     fs.writeFile(path.join(__dirname, 'settings', 'outputPath.txt'), file, (err, data) => { err && console.log(err)});
-
+        const settings = Object.assign({}, this.state.settings, { outputPath: path });
+        this.state = Object.assign({}, this.state, { settings });
+        saveState(this.state);
     }
     removeFile(file) {
         this.state = Object.assign({}, this.state, { files: this.state.files.delete(file) });
+        saveState(this.state);
     }
 }
 
