@@ -1,6 +1,5 @@
 const electron = require('electron');
 const ipcMain = require('electron').ipcMain;
-const less = require('less');
 const watch = require('node-watch');
 const exec = require('child_process').exec;
 const app = electron.app;
