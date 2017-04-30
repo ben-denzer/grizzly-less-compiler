@@ -4,6 +4,7 @@
   "description": "Less Compiler",
   "main": "main.js",
   "scripts": {
+    "prestart": "node-sass scss/main.scss -o css/",
     "start": "electron ."
   },
   "repository": "https://github.com/ben-denzer/grizzly-less-compiler",
