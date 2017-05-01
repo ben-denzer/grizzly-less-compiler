@@ -8,11 +8,8 @@ function filterOutput(str) {
     if (/^success/.test(str)) {
         return str;
     }
-    var temp = str.slice(str.search(/\d\dm/) + 3);
-    // temp = temp.split('').map(a => {
-    //     return a.charCodeAt(0) > 126 || a.charCodeAt(0) < 32 ? ' ' : a
-    // }).join('');
-    // return temp.replace(/\d\dm/g, ' ');
+    // remove the first section of the message - its not helpful
+    let temp = str.slice(str.search(/\d\dm/) + 3);
     return ansiHtml(temp);
 }
 
@@ -27,6 +24,9 @@ function makeStatusBox(fileName) {
                 <div class="removeButton" data-filename="${fileName}">X</div>
                 <span class="statusBox">
                     ${displayName}
+                    <div class="fullPath">
+                        ${fileName}
+                    </div>
                  </span>
             </div>
             <div class="statusRowRight">

@@ -53,6 +53,10 @@ body {
                         display: flex;
                         align-items: center;
 
+                        .fullPath {
+                            font-size: 12px;
+                        }
+
                         .removeButton {
                             font-size: 38px;
                             color: darkred;
@@ -86,6 +90,9 @@ body {
                 #loading {
                     height: 150px;
                     width: auto;
+                }
+                span {
+                    // display: block;
                 }
             }
         }
