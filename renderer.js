@@ -1,4 +1,5 @@
 const {ipcRenderer} = require('electron');
+const ansiHtml = require('ansi-html');
 
 const getId = (ID) => document.getElementById(ID);
 let activeFiles = new Set();
@@ -8,10 +9,11 @@ function filterOutput(str) {
         return str;
     }
     var temp = str.slice(str.search(/\d\dm/) + 3);
-    temp = temp.split('').map(a => {
-        return a.charCodeAt(0) > 126 || a.charCodeAt(0) < 32 ? ' ' : a
-    }).join('');
-    return temp.replace(/\d\dm/g, ' ');
+    // temp = temp.split('').map(a => {
+    //     return a.charCodeAt(0) > 126 || a.charCodeAt(0) < 32 ? ' ' : a
+    // }).join('');
+    // return temp.replace(/\d\dm/g, ' ');
+    return ansiHtml(temp);
 }
 
 function makeStatusBox(fileName) {
