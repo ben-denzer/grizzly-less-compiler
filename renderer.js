@@ -4,6 +4,15 @@ const ansiHtml = require('ansi-html');
 const getId = (ID) => document.getElementById(ID);
 let activeFiles = new Set();
 
+function fileEventListener(e) {
+    const myPath = getId('myFile').files[0].path.toString();
+    if (!/.less/i.test(myPath.slice(-5))) {
+        getId('outputContainer').innerText = "Thats Not A .less File";
+        return;
+    }
+    ipcRenderer.send('file added', myPath);
+}
+
 function filterOutput(str) {
     if (/^success/.test(str)) {
         return str;
@@ -24,9 +33,6 @@ function makeStatusBox(fileName) {
                 <div class="removeButton" data-filename="${fileName}">X</div>
                 <span class="statusBox">
                     ${displayName}
-                    <div class="fullPath">
-                        ${fileName}
-                    </div>
                  </span>
             </div>
             <div class="statusRowRight">
@@ -36,6 +42,11 @@ function makeStatusBox(fileName) {
     );
 }
 
+function outputChangeListener() {
+    const outputPath = getId('outputFile').files[0].path;
+    ipcRenderer.send('change output path', outputPath);
+}
+
 function populateStatusContainer() {
     statusHtml = [...activeFiles].map(makeStatusBox).join(' ');
     toggleListenersOnButtons(); // removes listeners
@@ -43,27 +54,8 @@ function populateStatusContainer() {
     toggleListenersOnButtons('add');
 }
 
-function replaceFileInput() {
-    // I was having a hell of a time removing the active status or
-    // whatever its called on my file input - Stack Overflow said to
-    // remove it and replace it
-    const myFile = getId('myFile');
-    if (myFile) {
-        myFile.remove();
-    }
-    const newInput = document.createElement('input');
-    newInput.type = 'file';
-    newInput.id = 'myFile';
-    newInput.addEventListener('change', () => {
-        const myPath = newInput.files[0].path.toString();
-        if (!/.less/i.test(myPath.slice(-5))) {
-            getId('outputContainer').innerText = "Thats Not A .less File";
-            replaceFileInput();
-            return;
-        }
-        ipcRenderer.send('file added', myPath);
-    });
-    getId('inputContainer').appendChild(newInput);
+function resetOutputPath() {
+    ipcRenderer.send('change output path', null);
 }
 
 function showLoading() {
@@ -104,18 +96,15 @@ function toggleListenersOnButtons(add) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    replaceFileInput();
     ipcRenderer.send('check initial settings');
-    getId('outputFile').addEventListener('change', () => {
-        const outputPath = getId('outputFile').files[0].path;
-        ipcRenderer.send('change output path', outputPath);
-    });
+    getId('outputFile').addEventListener('change', outputChangeListener);
+    getId('myFile').addEventListener('change', fileEventListener);
+    getId('resetOutputPathButton').addEventListener('click', resetOutputPath);
 });
 
 ipcRenderer.on('watching', (event, res) => {
     outputContainer.innerHTML = res.loading ? showLoading() : filterOutput(res.output);
     activeFiles.add(res.file);
-    replaceFileInput();
     populateStatusContainer();
 
     if (res.output && !/^success/.test(res.output)) {
@@ -131,15 +120,11 @@ ipcRenderer.on('removed', () => {
 });
 
 ipcRenderer.on('output path changed', (event, res) => {
-    getId('displayOutputPath').innerText = res || "Output path set to current folder";
-
-    const resetPath = () => { ipcRenderer.send('change output path', null) };
-
-    if (res) {
-        getId('resetOutputPathButton').style.display = 'block';
-        getId('resetOutputPathButton').addEventListener('click', resetPath);
-    } else {
+    if (!res || !res.length) {
         getId('resetOutputPathButton').style.display = 'none';
-        getId('resetOutputPathButton').removeEventListener('click', resetPath);
+        getId('displayOutputPath').innerText = "Output path set to current folder";
+    } else {
+        getId('resetOutputPathButton').style.display = 'block';
+        getId('displayOutputPath').innerText = res.split(/[\\\/]/).slice(-2).join('/');
     }
 });

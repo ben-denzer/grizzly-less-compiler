@@ -138,7 +138,5 @@ ipcMain.on('change output path', (event, file) => {
 });
 
 ipcMain.on('check initial settings', (e, file) => {
-    if (watchFiles.outputPath && watchFiles.outputPath !== 'null') {
-        e.sender.send('output path changed', watchFiles.outputPath);
-    }
-})
+    e.sender.send('output path changed', watchFiles.outputPath);
+});

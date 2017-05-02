@@ -1,11 +1,19 @@
 $fullHeight: 575px;
-$fullWidth: 750px;
+$fullWidth: 785px;
 $borderColor: #666;
+$sidebarColor: #444;
+$leftSideWidth: 70vw;
+$outputBoxHeight: 30vh;
 
 body {
     height: $fullHeight;
     width: $fullWidth;
     font-size: 18px;
+    background-color: $sidebarColor;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    margin: 0;
+    overflow-x: hidden;
 
     div {
         box-sizing: border-box;
@@ -22,7 +30,15 @@ body {
         }
 
         #mainWindow {
-            width: 170%;
+            width: $leftSideWidth;
+            min-width: $leftSideWidth;
+            max-width: $leftSideWidth;
+            background-color: #eee;
+            color: #222;
+            margin: 0;
+            padding: 0 5px;
+            min-height: 100vh;
+            padding-bottom: $outputBoxHeight;
 
             h1 {
                 font-size: 32px;
@@ -30,14 +46,27 @@ body {
             }
 
             label {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin: -10px 5px 10px 0;
+                height: 55px;
+                width: 55px;
+                background-color: $sidebarColor;
+                font-size: 40px;
+                font-weight: bold;
+                color: #eee;
+
+                &:hover {
+                    cursor: pointer;
+                    background-color: #222;
+                }
             }
 
             #inputContainer {
-                margin-bottom: 25px;
-
-                input {
-
-                }
+                position: absolute;
+                visibility: hidden;
+                z-index: -1;
             }
 
             #statusContainer {
@@ -52,6 +81,7 @@ body {
                     .statusRowLeft {
                         display: flex;
                         align-items: center;
+                        font-weight: bold;
 
                         .fullPath {
                             font-size: 12px;
@@ -86,24 +116,43 @@ body {
                 }
             }
 
-            #outputContainer {
-                #loading {
-                    height: 150px;
-                    width: auto;
+            #outputBox {
+                width: 100%;
+                margin-left: -5px;
+                position: fixed;
+                bottom: 0;
+                height: $outputBoxHeight;
+                border-top: 2px solid $borderColor;
+                background-color: #fff;
+                padding: 10px;
+
+                h2 {
+                    font-size: 16px;
+                    font-weight: bold;
+                    margin: 3px 0 10px;
                 }
-                span {
-                    // display: block;
+
+                #loading {
+                    height: 70px;
+                    width: auto;
                 }
             }
         }
 
         #sidebar {
+            width: calc(100vw - $leftSideWidth);
+            min-width: calc(100vw - $leftSideWidth);
+            max-width: calc(100vw - $leftSideWidth);
+            padding: 5px;
+            font-weight: bold;
+
             label {
                 font-size: 14px;
             }
 
             input {
-                margin-bottom: 25px;
+                margin: 15px 0 5px;
+                color: $sidebarColor;
             }
 
             #displayOutputPath {
@@ -112,11 +161,11 @@ body {
 
             #resetOutputPathButton {
                 font-size: 14px;
-                color: blue;
-                display: none;
+                color: lightskyblue;
 
                 &:hover {
                     text-decoration: underline;
+                    cursor: pointer;
                 }
             }
         }

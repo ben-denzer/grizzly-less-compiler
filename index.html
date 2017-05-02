@@ -11,15 +11,18 @@
     <div id="pageContainer">
         <div id="mainWindow">
             <h1>Grizzly</h1>
-            <label>Choose a Less File</label>
+            <label for="myFile">+</label>
             <div id="inputContainer">
                 <input id="myFile" type="file">
             </div>
             <div id="statusContainer"></div>
-            <div id="outputContainer"></div>
+            <div id="outputBox">
+                <h2>Status:</h2>
+                <div id="outputContainer"></div>
+            </div>
         </div>
         <div id="sidebar">
-            <label>Choose an Output File - (default is to put the css file in the same directory as the Less file)</label>
+            <label>Choose an Output File</label>
             <div id="outputFileContainer">
                 <input type="file" id="outputFile">
             </div>
