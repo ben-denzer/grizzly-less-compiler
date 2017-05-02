@@ -83,11 +83,13 @@ const compileLess = (file = watchFiles.get()[0], cb) => {
     const outputPath = watchFiles.outputPath || path.join(path.normalize(`${fullPath}`), `${fileName}.css`);
     watcher.close();
     watcher = watch(watchFiles.get(), (e, filename) => {
+        console.log(e, filename);
         if (e === 'update') {
             cb({ loading: true });
             compileLess(filename, cb);
         }
     });
+    watcher.on('error', err => console.log('error - ', err));
     exec(`lessc "${file}" --autoprefix="last 4 versions" ${outputPath}`, (error, stdout, stderr) => {
         if (error) {
             mainWindow.focus();

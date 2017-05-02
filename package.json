@@ -1,9 +1,11 @@
 {
   "name": "grizzly-less-compiler",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Less Compiler",
   "main": "main.js",
   "scripts": {
+    "build-dev": "npm install && npm run electron-rebuild && npm start",
+    "electron-rebuild": "electron-rebuild",
     "prestart": "node-sass scss/main.scss -o css/",
     "start": "electron ."
   },
@@ -20,11 +22,14 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "~1.6.2",
+    "electron-rebuild": "^1.5.7",
     "extract-zip": "=1.6.0",
     "node-sass": "^4.5.2"
   },
   "dependencies": {
     "ansi-html": "0.0.7",
+    "less": "^2.7.2",
+    "less-plugin-autoprefix": "^1.5.1",
     "node-watch": "^0.5.2"
   }
 }

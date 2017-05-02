@@ -7,6 +7,5 @@
 **To run and make changes locally**
 1. `git clone` this repository
 2. `cd grizzly-less-compiler`
-3. `npm install` or `yarn`
-4. `npm install -g less less-plugin-autoprefix` or `yarn global add less less-plugin-autoprefix`
-5. `npm start`
+3. `npm run build-dev`
+For now, every time you make a change to the code, you have to `ctrl+c` and `npm start` to reload the app
