@@ -1,7 +1,7 @@
 $fullHeight: 575px;
 $fullWidth: 785px;
 $borderColor: #666;
-$sidebarColor: #444;
+$sidebarColor: #716363;
 $leftSideWidth: 70vw;
 $outputBoxHeight: 30vh;
 
@@ -40,26 +40,31 @@ body {
             min-height: 100vh;
             padding-bottom: $outputBoxHeight;
 
-            h1 {
-                font-size: 32px;
-                text-align: center;
-            }
+            header {
+                label {
+                    position: absolute;
+                    top: 15px;
+                    left: 5px;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    margin: -10px 5px 10px 0;
+                    height: 55px;
+                    width: 55px;
+                    background-color: $sidebarColor;
+                    font-size: 40px;
+                    font-weight: bold;
+                    color: #eee;
 
-            label {
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                margin: -10px 5px 10px 0;
-                height: 55px;
-                width: 55px;
-                background-color: $sidebarColor;
-                font-size: 40px;
-                font-weight: bold;
-                color: #eee;
+                    &:hover {
+                        cursor: pointer;
+                        background-color: #222;
+                    }
+                }
 
-                &:hover {
-                    cursor: pointer;
-                    background-color: #222;
+                #logoContainer {
+                    margin: 0 auto;
+                    text-align: center;
                 }
             }
 
