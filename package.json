@@ -1,12 +1,12 @@
 {
   "name": "grizzly-less-compiler",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Less Compiler",
   "main": "main.js",
   "scripts": {
     "build-dev": "npm install && npm run electron-rebuild && npm start",
     "electron-rebuild": "electron-rebuild",
-    "electron-packager": "electron-packager",
+    "electron-packager-windows": "electron-packager . --icon=img\\Icon256.png",
     "prestart": "node-sass scss/main.scss -o css/",
     "start": "electron ."
   },
